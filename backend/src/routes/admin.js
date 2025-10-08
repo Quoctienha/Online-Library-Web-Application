@@ -70,7 +70,7 @@ router.post('/books', upload.fields([
     }
 
     const { title, author, description, category, publishYear, pageCount, language } = req.body;
-
+    //console.log(req.user._id)
     const book = await Book.create({
       title,
       author,
@@ -80,7 +80,7 @@ router.post('/books', upload.fields([
       pdfFile: req.files.pdfFile[0].filename,
       publishYear: publishYear || undefined,
       pageCount: pageCount || undefined,
-      language: language || 'Vietnamese',
+      bookLanguage: language || 'Vietnamese',
       uploadedBy: req.user._id
     });
 
@@ -127,7 +127,7 @@ router.put('/books/:id', upload.fields([
     book.category = category || book.category;
     book.publishYear = publishYear || book.publishYear;
     book.pageCount = pageCount || book.pageCount;
-    book.language = language || book.language;
+    book.bookLanguage = language || book.bookLanguage;
 
     // Update cover image if new one uploaded
     if (req.files && req.files.coverImage) {

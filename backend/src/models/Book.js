@@ -17,11 +17,11 @@ const bookSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    //required: true
+    required: true
   },
   coverImage: {
     type: String,
-    //required: true
+    required: true
   },
   pdfFile: {
     type: String,
@@ -33,7 +33,7 @@ const bookSchema = new mongoose.Schema({
   pageCount: {
     type: Number
   },
-  language: {
+  bookLanguage: {
     type: String,
     default: 'Vietnamese'
   },
@@ -51,7 +51,19 @@ const bookSchema = new mongoose.Schema({
 });
 
 // Index for search
-bookSchema.index({ title: 'text', author: 'text', description: 'text' });
+//bookSchema.index({ title: 'text', author: 'text', description: 'text' });
+bookSchema.index(
+  { title: 'text', author: 'text', description: 'text' },
+  { 
+    default_language: 'none',  // Dùng 'none' để support tiếng Việt tốt hơn
+    weights: {  // Tùy chọn: set trọng số cho từng field
+      title: 10,
+      author: 5,
+      description: 1
+    }
+  }
+);
+
 
 const Book = mongoose.model('Book', bookSchema);
 export default Book;
