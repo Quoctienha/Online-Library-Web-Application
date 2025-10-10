@@ -1,76 +1,17 @@
-import express from 'express';
-import multer from 'multer';
-import path from 'path';
 import fs from 'fs';
-import { fileURLToPath } from 'url';
+import path from 'path';
 import Book from '../models/Book.js';
-import { verifyToken, isAdmin } from '../middleware/auth.js';
+import { getRootDir } from '../config/multerConfig.js';
 
-const router = express.Router();
-
-// ES6 __dirname equivalent
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Root directory (backend/)
-const rootDir = path.join(__dirname, '../../');
-
-// Multer storage configuration
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    // Đường dẫn tuyệt đối đến uploads folder
-    const uploadPath = file.fieldname === 'coverImage' 
-      ? path.join(rootDir, 'uploads/covers')
-      : path.join(rootDir, 'uploads/pdfs');
-    
-    if (!fs.existsSync(uploadPath)) {
-      fs.mkdirSync(uploadPath, { recursive: true });
-    }
-    cb(null, uploadPath);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  }
-});
-
-const fileFilter = (req, file, cb) => {
-  if (file.fieldname === 'coverImage') {
-    if (file.mimetype.startsWith('image/')) {
-      cb(null, true);
-    } else {
-      cb(new Error('Chỉ chấp nhận file ảnh'), false);
-    }
-  } else if (file.fieldname === 'pdfFile') {
-    if (file.mimetype === 'application/pdf') {
-      cb(null, true);
-    } else {
-      cb(new Error('Chỉ chấp nhận file PDF'), false);
-    }
-  }
-};
-
-const upload = multer({
-  storage,
-  fileFilter,
-  limits: { fileSize: 50 * 1024 * 1024 } // 50MB
-});
-
-// Apply admin middleware to all routes
-router.use(verifyToken, isAdmin);
-
-// @route   POST /api/admin/books
-router.post('/books', upload.fields([
-  { name: 'coverImage', maxCount: 1 },
-  { name: 'pdfFile', maxCount: 1 }
-]), async (req, res) => {
+// Create a new book
+export const createBook = async (req, res) => {
   try {
     if (!req.files || !req.files.coverImage || !req.files.pdfFile) {
       return res.status(400).json({ message: 'Vui lòng tải lên ảnh bìa và file PDF' });
     }
 
     const { title, author, description, category, publishYear, pageCount, language } = req.body;
-    //console.log(req.user._id)
+    
     const book = await Book.create({
       title,
       author,
@@ -92,6 +33,7 @@ router.post('/books', upload.fields([
     console.error('Create book error:', error);
     
     // Delete uploaded files if book creation fails
+    const rootDir = getRootDir();
     if (req.files) {
       if (req.files.coverImage) {
         const coverPath = path.join(rootDir, 'uploads/covers', req.files.coverImage[0].filename);
@@ -105,13 +47,10 @@ router.post('/books', upload.fields([
     
     res.status(500).json({ message: 'Lỗi khi thêm sách' });
   }
-});
+};
 
-// @route   PUT /api/admin/books/:id
-router.put('/books/:id', upload.fields([
-  { name: 'coverImage', maxCount: 1 },
-  { name: 'pdfFile', maxCount: 1 }
-]), async (req, res) => {
+// Update an existing book
+export const updateBook = async (req, res) => {
   try {
     const book = await Book.findById(req.params.id);
     
@@ -129,6 +68,7 @@ router.put('/books/:id', upload.fields([
     book.pageCount = pageCount || book.pageCount;
     book.bookLanguage = language || book.bookLanguage;
 
+    const rootDir = getRootDir();
     // Update cover image if new one uploaded
     if (req.files && req.files.coverImage) {
       const oldCoverPath = path.join(rootDir, 'uploads/covers', book.coverImage);
@@ -140,7 +80,7 @@ router.put('/books/:id', upload.fields([
 
     // Update PDF file if new one uploaded
     if (req.files && req.files.pdfFile) {
-      const oldPdfPath = path.join(rootDir, 'uploads/pdfs', book.pdfFile);
+      const oldPdfPath = path.join(rootDir, 'Uploads/pdfs', book.pdfFile);
       if (fs.existsSync(oldPdfPath)) {
         fs.unlinkSync(oldPdfPath);
       }
@@ -157,10 +97,10 @@ router.put('/books/:id', upload.fields([
     console.error('Update book error:', error);
     res.status(500).json({ message: 'Lỗi khi cập nhật sách' });
   }
-});
+};
 
-// @route   DELETE /api/admin/books/:id
-router.delete('/books/:id', async (req, res) => {
+// Delete a book
+export const deleteBook = async (req, res) => {
   try {
     const book = await Book.findById(req.params.id);
     
@@ -168,6 +108,7 @@ router.delete('/books/:id', async (req, res) => {
       return res.status(404).json({ message: 'Không tìm thấy sách' });
     }
 
+    const rootDir = getRootDir();
     // Delete cover image
     const coverPath = path.join(rootDir, 'uploads/covers', book.coverImage);
     if (fs.existsSync(coverPath)) {
@@ -175,7 +116,7 @@ router.delete('/books/:id', async (req, res) => {
     }
 
     // Delete PDF file
-    const pdfPath = path.join(rootDir, 'uploads/pdfs', book.pdfFile);
+    const pdfPath = path.join(rootDir, 'Uploads/pdfs', book.pdfFile);
     if (fs.existsSync(pdfPath)) {
       fs.unlinkSync(pdfPath);
     }
@@ -187,10 +128,10 @@ router.delete('/books/:id', async (req, res) => {
     console.error('Delete book error:', error);
     res.status(500).json({ message: 'Lỗi khi xóa sách' });
   }
-});
+};
 
-// @route   GET /api/admin/stats
-router.get('/stats', async (req, res) => {
+// Get admin statistics
+export const getStats = async (req, res) => {
   try {
     const totalBooks = await Book.countDocuments();
     const totalDownloads = await Book.aggregate([
@@ -205,6 +146,4 @@ router.get('/stats', async (req, res) => {
     console.error('Stats error:', error);
     res.status(500).json({ message: 'Lỗi server' });
   }
-});
-
-export default router;
+};

@@ -8,9 +8,9 @@ import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import { fileURLToPath } from 'url';
 // Routes
-import authRoutes from './routes/auth.js';
-import bookRoutes from './routes/books.js';
-import adminRoutes from './routes/admin.js';
+import authRoutes from './routes/authRoutes.js';
+import bookRoutes from './routes/bookRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 
 // ES6 __dirname equivalent
 const __filename = fileURLToPath(import.meta.url);

@@ -31,8 +31,8 @@ const refreshTokenSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// TTL Index - Auto delete after 24h from expiresAt
-refreshTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 86400 });
+// TTL Index - remove exactly at expiresAt
+refreshTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 // Virtual: Check if token expired
 refreshTokenSchema.virtual('isExpired').get(function() {

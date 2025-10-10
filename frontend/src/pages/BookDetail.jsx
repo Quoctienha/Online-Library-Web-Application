@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { bookAPI } from '../services/api';
 import { toast, Slide } from 'react-toastify';
 import { ArrowDownTrayIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
+import noImage from '../assets/no-image.jpg';
 
 const BookDetail = () => {
   const { id } = useParams();
@@ -141,7 +142,7 @@ const BookDetail = () => {
               alt={book.title}
               className="w-full rounded-lg shadow-md"
               onError={(e) => {
-                e.target.src = 'https://via.placeholder.com/300x400?text=No+Image';
+                e.target.src = noImage;
               }}
             />
             

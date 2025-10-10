@@ -1,11 +1,7 @@
-import express from 'express';
 import Book from '../models/Book.js';
-import { verifyToken } from '../middleware/auth.js';
 
-const router = express.Router();
-
-// @route   GET /api/books
-router.get('/', async (req, res) => {
+// Get all books with search, category, and pagination
+export const getBooks = async (req, res) => {
   try {
     const { search, category, page = 1, limit = 12 } = req.query;
     
@@ -43,10 +39,10 @@ router.get('/', async (req, res) => {
     console.error(error);
     res.status(500).json({ message: 'Lỗi server' });
   }
-});
+};
 
-// @route   GET /api/books/categories/list
-router.get('/categories/list', async (req, res) => {
+// Get all unique categories
+export const getCategories = async (req, res) => {
   try {
     const categories = await Book.distinct('category');
     res.json(categories);
@@ -54,10 +50,10 @@ router.get('/categories/list', async (req, res) => {
     console.error(error);
     res.status(500).json({ message: 'Lỗi server' });
   }
-});
+};
 
-// @route   GET /api/books/:id
-router.get('/:id', async (req, res) => {
+// Get a single book by ID
+export const getBookById = async (req, res) => {
   try {
     const book = await Book.findById(req.params.id)
       .populate('uploadedBy', 'name email');
@@ -71,10 +67,10 @@ router.get('/:id', async (req, res) => {
     console.error(error);
     res.status(500).json({ message: 'Lỗi server' });
   }
-});
+};
 
-// @route   POST /api/books/:id/download
-router.post('/:id/download', verifyToken, async (req, res) => {
+// Handle book download
+export const downloadBook = async (req, res) => {
   try {
     const book = await Book.findById(req.params.id);
     
@@ -93,6 +89,4 @@ router.post('/:id/download', verifyToken, async (req, res) => {
     console.error(error);
     res.status(500).json({ message: 'Lỗi server' });
   }
-});
-
-export default router;
+};

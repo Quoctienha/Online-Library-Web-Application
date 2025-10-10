@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { bookAPI } from '../services/api';
 import { toast, Slide } from 'react-toastify';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { bookAPI } from '../services/api';
+import BookCard from '../components/BookCard';
 
 const Home = () => {
   const [books, setBooks] = useState([]);
@@ -51,7 +51,6 @@ const Home = () => {
         theme: "light",
         transition: Slide,
       });
-      
     } finally {
       setLoading(false);
     }
@@ -80,7 +79,6 @@ const Home = () => {
     setPagination({ ...pagination, currentPage: newPage });
     window.scrollTo(0, 0);
   };
-
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -133,32 +131,7 @@ const Home = () => {
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {books.map((book) => (
-              <Link
-                key={book._id}
-                to={`/books/${book._id}`}
-                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300"
-              >
-                <div className="aspect-[3/4] overflow-hidden bg-gray-200">
-                  <img
-                    src={`http://localhost:3000/uploads/covers/${book.coverImage}`}
-                    alt={book.title}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.target.src = 'https://via.placeholder.com/300x400?text=No+Image';
-                    }}
-                  />
-                </div>
-                <div className="p-4">
-                  <h3 className="font-semibold text-gray-900 mb-1 line-clamp-2">
-                    {book.title}
-                  </h3>
-                  <p className="text-sm text-gray-600 mb-2">{book.author}</p>
-                  <div className="flex items-center justify-between text-xs text-gray-500">
-                    <span>{book.category}</span>
-                    <span>{book.downloadCount} lượt tải</span>
-                  </div>
-                </div>
-              </Link>
+              <BookCard key={book._id} book={book} />
             ))}
           </div>
 
