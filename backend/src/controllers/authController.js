@@ -110,12 +110,12 @@ export const refreshToken = async (req, res) => {
     }
 
     const newAccessToken = generateAccessToken(refreshToken.user);
-    //const newRefreshToken = await generateRefreshToken(refreshToken.user, req.ip);
+    const newRefreshToken = await generateRefreshToken(refreshToken.user, req.ip);
 
-    //refreshToken.revoke(req.ip, newRefreshToken);
-    //await refreshToken.save();
+    refreshToken.revoke(req.ip, newRefreshToken);
+    await refreshToken.save();
 
-    //setRefreshTokenCookie(res, refreshToken);
+    setRefreshTokenCookie(res, newRefreshToken);
 
     res.json({
       accessToken: newAccessToken,
