@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import Book from '../models/Book.js';
 import { getRootDir } from '../config/multerConfig.js';
+import { generateEmbedding } from '../config/chatbot/embedding.js'
 
 // Create a new book
 export const createBook = async (req, res) => {
@@ -11,7 +12,11 @@ export const createBook = async (req, res) => {
     }
 
     const { title, author, description, category, publishYear, pageCount, language } = req.body;
-    
+    const context = `Title: ${title}\nAuthor: ${author}\nCategory: ${category}\nDescription: ${description}`;
+
+    //embedding
+    const vEmbedding = await generateEmbedding(context);
+
     const book = await Book.create({
       title,
       author,
@@ -22,7 +27,8 @@ export const createBook = async (req, res) => {
       publishYear: publishYear || undefined,
       pageCount: pageCount || undefined,
       bookLanguage: language || 'Vietnamese',
-      uploadedBy: req.user._id
+      uploadedBy: req.user._id,
+      embedding: vEmbedding
     });
 
     res.status(201).json({ 
@@ -59,6 +65,10 @@ export const updateBook = async (req, res) => {
     }
 
     const { title, author, description, category, publishYear, pageCount, language } = req.body;
+    const context = `Title: ${title}\nAuthor: ${author}\nCategory: ${category}\nDescription: ${description}`;
+
+    //embedding
+    const vEmbedding = await generateEmbedding(context);
 
     book.title = title || book.title;
     book.author = author || book.author;
@@ -67,6 +77,7 @@ export const updateBook = async (req, res) => {
     book.publishYear = publishYear || book.publishYear;
     book.pageCount = pageCount || book.pageCount;
     book.bookLanguage = language || book.bookLanguage;
+    book.embedding = vEmbedding || book.embedding;
 
     const rootDir = getRootDir();
     // Update cover image if new one uploaded

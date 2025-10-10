@@ -11,6 +11,8 @@ import { fileURLToPath } from 'url';
 import authRoutes from './routes/authRoutes.js';
 import bookRoutes from './routes/bookRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import searchRoutes from './routes/testVectorSearch.js';
+import chatbotRoutes from './routes/chatbotRoutes.js';
 
 // ES6 __dirname equivalent
 const __filename = fileURLToPath(import.meta.url);
@@ -57,6 +59,8 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 app.use('/api/auth', authRoutes);
 app.use('/api/books', bookRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/search', searchRoutes);
+app.use('/api/chatbot', chatbotRoutes);
 
 // Health check
 app.get('/', (req, res) => {

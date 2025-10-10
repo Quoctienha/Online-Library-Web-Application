@@ -57,10 +57,10 @@ const BookFormModal = ({
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Mô tả (200 ký tự) <span className="text-red-500">*</span>
+              Mô tả (500 ký tự) <span className="text-red-500">*</span>
             </label>
             <textarea
-              maxLength="200"
+              maxLength="500"
               name="description"
               required
               rows="4"
@@ -72,10 +72,11 @@ const BookFormModal = ({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Thể loại</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Thể loại<span className="text-red-500">*</span></label>
               <input
                 type="text"
                 name="category"
+                required
                 value={formData.category}
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
