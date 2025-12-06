@@ -10,6 +10,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import BookDetail from './pages/BookDetail';
 import AdminDashboard from './pages/AdminDashboard';
+import ChatBox from "./components/ChatBox";
 
 // Protected Route Component
 const ProtectedRoute = ({ children, adminOnly = false }) => {
@@ -96,7 +97,7 @@ function AppContent() {
         theme="light"
         transition={Slide}
       />
-
+      <ChatBox />
     </div>
   );
 }

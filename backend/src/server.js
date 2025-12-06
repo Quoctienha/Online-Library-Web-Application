@@ -83,7 +83,7 @@ app.use((req, res) => {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error('❌ Error:', err.stack);
+  console.error('Error:', err.stack);
   res.status(err.status || 500).json({ 
     message: err.message || 'Có lỗi xảy ra!',
     error: process.env.NODE_ENV === 'development' ? err.message : {}
